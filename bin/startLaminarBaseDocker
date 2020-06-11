@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# This bash script starts building a collection of base docker images for 
+# use by Laminar. 
+
+laminarc queue buildDockerBase DIST=bionic
+
+laminarc queue buildDockerBase DIST=eoan
+
+laminarc queue buildDockerBase DIST=focal

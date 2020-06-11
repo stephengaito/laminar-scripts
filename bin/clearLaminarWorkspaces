@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# This bash script resets/clears out laminar...
+
+sudo rm -rf /home/dev/laminar/tasks/workspaces

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# This bash scritp automates the installation of the Laminar-scripts.
+
+
+source laminar.conf
+
+export JOB_DIR=$LAMINAR_HOME/cfg/jobs
+export BIN_DIR=$HOME/bin
+
+cp bin/startLaminar           $BIN_DIR
+cp bin/clearLaminar           $BIN_DIR
+cp bin/clearLaminarWorkspaces $BIN_DIR
+cp bin/startLaminarBaseDocker $BIN_DIR 
+
+cp jobs/dockerExample.run   $JOB_DIR
+cp jobs/hello.run           $JOB_DIR
+cp jobs/buildDockerBase.run $JOB_DIR 
+
+ln -fs $LAMINAR_BIN/laminarc $BIN_DIR/laminarc

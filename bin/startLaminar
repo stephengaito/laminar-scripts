@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# This bash script setups and runs laminar
+
+export LAMINAR_HOME=/home/dev/laminar/tasks
+export LAMINAR_BIND_HTTP=*:8888
+export LAMINAR_TITLE="PerceptiSys Laminar CI"
+export LAMINAR_KEEP_RUNDIRS=5
+
+echo ""
+echo "laminar is running on:"
+echo ""
+echo "  http://10.0.0.1:8888/"
+echo ""
+echo "laminar documentation:"
+echo ""
+echo "  https://laminar.ohwg.net/docs.html"
+echo ""
+echo "Type Ctrl-C to exit"
+echo ""
+
+/home/dev/laminar/usr/sbin/laminard
+
+echo ""

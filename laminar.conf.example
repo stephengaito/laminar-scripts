@@ -1,0 +1,7 @@
+# The Laminar configuration that I use...
+#
+export LAMINAR_HOME=/home/dev/laminar/tasks
+export LAMINAR_BIN=/home/dev/laminar/bin
+export LAMINAR_BIND_HTTP=*:8888
+export LAMINAR_TITLE="PerceptiSys Laminar CI"
+export LAMINAR_KEEP_RUNDIRS=5

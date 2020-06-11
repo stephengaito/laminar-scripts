@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# This bash script resets/clears out laminar...
+
+sudo rm -rf /home/dev/laminar/tasks/laminar.sqlite
+
+sudo rm -rf /home/dev/laminar/tasks/archive
+
+sudo rm -rf /home/dev/laminar/tasks/run
