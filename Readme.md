@@ -2,7 +2,7 @@
 
 This repository contains a collection of 
 [Laminar](https://laminar.ohwg.net/) scripts and jobs. It also, 
-incedentally provides an example of one developer's use of Laminar. 
+incedentally, provides an example of one developer's use of Laminar. 
 
 [Laminar](https://github.com/ohwgiles/laminar)
 is an ultra simple and ultra light-weight 
@@ -14,16 +14,16 @@ number of projects.
 For my needs, I only really use Laminar in a "semi-continuous" mode. When 
 ever I have major changes I fire up Laminar and start the overall build 
 process for a particular project. To do this, I have written a small 
-collection of bash scripts. 
+collection of bash scripts. You can find these scripts in the `bin` directory.
 
 On my development machine, I already have Docker installed so I use docker 
 images to control the build / test / deploy environment. So one of the 
 most important Laminar jobs I require, is a job to (re)build the basic 
-docker images I use. 
+docker images I use. You can find this job in the `jobs` directory.
 
 This repository contains a (small) collection of scripts and Laminar jobs. 
-It also contains some Tips and Tricks documents (to remind myself how and 
-why I have done things in the way they are). 
+It also contains some Tips and Tricks documents to remind myself how and 
+why I have done things in the way they are. 
 
 Hopefully others will find these Tips and Tricks as well as the associated 
 example Laminar jobs useful. (Your milage may vary).
