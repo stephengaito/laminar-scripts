@@ -6,15 +6,22 @@
 source laminar.conf
 
 export JOB_DIR=$LAMINAR_HOME/cfg/jobs
+export SCP_DIR=$LAMINAR_HOME/cfg/scripts
+
 export BIN_DIR=$HOME/bin
 
+mkdir -p $BIN_DIR
 cp bin/startLaminar           $BIN_DIR
-cp bin/clearLaminar           $BIN_DIR
-cp bin/clearLaminarWorkspaces $BIN_DIR
+cp bin/clearLaminar*          $BIN_DIR
 cp bin/startLaminarBaseDocker $BIN_DIR 
 
+mkdir -p $JOB_DIR
 cp jobs/dockerExample.run   $JOB_DIR
 cp jobs/hello.run           $JOB_DIR
 cp jobs/buildDockerBase.run $JOB_DIR 
+
+mkdir -p $SCP_DIR
+cp scripts/*Docker             $SCP_DIR
+cp scripts/setExtraLaminarVars $SCP_DIR
 
 ln -fs $LAMINAR_BIN/laminarc $BIN_DIR/laminarc

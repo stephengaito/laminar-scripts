@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# This bash script runs a docker run command in a specified docker 
+# container AND runs as the *root* user. 
+
+# Since the scripts we run inside this docker container *might* themselves 
+# run docker commands we follow the docker-out-of-docker pattern:
+#
+# https://jpetazzo.github.io/2015/09/03/do-not-use-docker-in-docker-for-ci/
+#
+# This only works IF the specified docker container has the docker-cli 
+# installed 
+
+dumb-init -v -- docker run --rm -i             \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v $PWD:/home/dev                            \
+  -v $PWORKSPACE/$DIST:/workspace              \
+  -v $ARCHIVE:/archive                         \
+  $*

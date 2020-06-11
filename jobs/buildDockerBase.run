@@ -3,7 +3,7 @@
 # This Laminar bash script builds a base Docker image which can be used as 
 # a minimal image for other purposes. 
 
-# It contains, git, sudo and the dev user.
+# It contains, git, sudo, docker-cli and the dev user.
 
 mkdir dockerDir
 
@@ -21,6 +21,10 @@ RUN apt update && \
     git    \
     sudo
 
+COPY docker-ce-cli_19.03.11~3-0~ubuntu-${DIST}_amd64.deb /
+
+RUN dpkg -i docker-ce-cli_19.03.11~3-0~ubuntu-${DIST}_amd64.deb
+
 RUN groupadd --gid 4242 dev && \
   useradd --create-home --uid 4242 --gid 4242 --groups sudo dev --shell /bin/bash
 
@@ -31,6 +35,10 @@ DOCKER_FILE
 cat dockerDir/Dockerfile
 
 cd dockerDir
+
+wget https://download.docker.com/linux/ubuntu/dists/$DIST/pool/stable/amd64/docker-ce-cli_19.03.11~3-0~ubuntu-${DIST}_amd64.deb
+
+cat wget-log
 
 dumb-init -v docker build -t laminar_$DIST .
 
