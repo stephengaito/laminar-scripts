@@ -1,5 +1,8 @@
 # Laminar control scripts
 
+This directory captures the command line scripts used to control my 
+semi-continuous use of Laminar. 
+
 - `startLaminar` starts laminar running, echos the UI url, Laminar 
   documentation url and runs in the foreground (waiting for Ctrl-C to 
   stop). 
