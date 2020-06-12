@@ -15,14 +15,26 @@ else
   export PROJECT="default"
 fi
 #
-export PWORKSPACE=$LAMINAR_HOME/workspaces/$PROJECT
+echo laminarc set PROJECT=$PROJECT
 laminarc set PROJECT=$PROJECT
+#
+export PWORKSPACE=$LAMINAR_HOME/workspaces/$PROJECT
+#
+echo laminarc set PWORKSPACE=$PWORKSPACE
 laminarc set PWORKSPACE=$PWORKSPACE
 #
-echo setting PROJECT to $PROJECT
-echo setting PWORKSPACE to $PWORKSPACE
-#
 mkdir -p $PWORKSPACE
+
+# Ensure the DIST evnvironment variable is set to a sane value
+#
+if test -z "$DIST" ; then
+  export DIST=bionic
+fi
+#
+echo laminarc set DIST=$DIST
+laminarc set DIST=$DIST
+#
+mkdir -p $PWORKSPACE/$DIST
 
 # Apply each environment variable declared in the project conf file
 #
@@ -48,14 +60,9 @@ if test -r $ENV ; then
    done < $ENV
 fi
 
-# Ensure the DIST evnvironment variable is set to a sane value
+# Run the project before script
 #
-if test -z "$DIST" ; then
-  export DIST=bionic
+BEFORE=$LAMINAR_HOME/cfg/jobs/${PROJECT}.before
+if test -x $BEFORE ; then
+  $BEFORE
 fi
-#
-laminarc set DIST=$DIST
-#
-echo setting DIST to $DIST
-#
-mkdir -p $PWORKSPACE/$DIST
