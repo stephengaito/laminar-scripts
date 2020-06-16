@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# This Laminar bash script is meant to be *sourced* at the start of a 
+# Laminar run. It sets up a number of "standard" environment variables for 
+# use in other scrpits. 
+
+# Capture the current directory as the RUNDIR
+#
+export LAMINAR_RUNDIR=$PWD
+
+# Setup the Laminar results file
+#
+export LRESULTS_FILE=$LAMINAR_RUNDIR/laminarRunResults
+#
+# Create an empty successful results files
+#
+rm -rf $LRESULTS_FILE ; date > $LRESULTS_FILE
+
+# record the Laminar variables
+#
+export LAMINAR_VARS=$LAMINAR_RUNDIR/reSourceLaminarVars
+#
+rm -rf $LAMINAR_VARS
+cat <<VARS_FUNCTIONS > $LAMINAR_VARS
+# This Laminar bash function records an environment variable in the 
+# \$LAMINAR_VARS file.
+#
+function recordVar {
+  varName=\$1
+  shift
+  echo "export \$varName=\"\$*\"" >> \$LAMINAR_VARS
+  source \$LAMINAR_VARS
+}
+#
+# This Laminar bash function records an comment in the 
+# \$LAMINAR_VARS file.
+#
+function recordComment {
+  echo "# \$*" >> \$LAMINAR_VARS
+}
+#
+VARS_FUNCTIONS
+
+source $LAMINAR_VARS
+
+recordVar LAMINAR_RUNDIR $LAMINAR_RUNDIR
+recordVar LAMINAR_VARS $LAMINAR_VARS
+recordVar CONTEXT $CONTEXT
+recordVar JOB $JOB
+recordVar RUN $RUN
+recordVar ARCHIVE $ARCHIVE
+recordVar WORKSPACE $WORKSPACE
+recordVar PWORKSPACE $PWORKSPACE
+recordVar DIST $DIST
+recordVar LRESULTS_FILE $LRESULTS_FILE
+recordComment

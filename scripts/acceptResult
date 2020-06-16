@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# This Laminar bash script runs an other bash script and records its 
+# success or failure in a results file for later reporting (and potential 
+# failure). 
+
+if test -z "$LRESULTS_FILE" ; then
+  echo "PANIC: you need to *source* the 'setupLaminarVars' script!!"
+  exit 1
+fi
+
+CMD=$*
+
+$CMD
+CMD_RESULT=$?
+
+if test $CMD_RESULT -eq 0 ; then
+  echo "SUCCESS: $CMD" >> $LRESULTS_FILE
+else
+  echo "FAILURE: $CMD" >> $LRESULTS_FILE
+fi

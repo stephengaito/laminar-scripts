@@ -3,8 +3,6 @@
 # This bash script runs a docker run command in a specified docker 
 # container AND runs as the *root* user. 
 
-dumb-init -v -- docker run --rm -i             \
-  -v $PWD:/home/dev                            \
-  -v $PWORKSPACE/$DIST:/workspace              \
-  -v $ARCHIVE:/archive                         \
+dumb-init -v -- docker run --rm -i \
+  -v $LAMINAR_HOME:$LAMINAR_HOME   \
   $*

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# This Laminar bash script reports the LRESULTS_FILE and exists with an 
+# non-zero error code if any result failed. 
+
+if test -z "$LRESULTS_FILE" ; then
+  echo "PANIC: you need to *source* the 'setupLaminarVars' script!!"
+  exit 1
+fi
+
+# Let the user know what the testOutputResults were
+#
+echo ""
+echo "-------------------------------------------------------"
+echo "Laminar $JOB/$RUN results:"
+echo "-------------------------------------------------------"
+cat $LRESULTS_FILE
+date
+echo "-------------------------------------------------------"
+echo ""
+
+# fail the script IF we find the work 'FAILURE' in the testOutputResults
+#
+if grep FAILURE $LRESULTS_FILE ; then 
+  exit 1
+fi
