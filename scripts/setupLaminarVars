@@ -21,7 +21,8 @@ rm -rf $LRESULTS_FILE ; date > $LRESULTS_FILE
 export LAMINAR_VARS=$LAMINAR_RUNDIR/reSourceLaminarVars
 #
 rm -rf $LAMINAR_VARS
-cat <<VARS_FUNCTIONS > $LAMINAR_VARS
+cat <<LAMINAR_FUNCTIONS > $LAMINAR_VARS
+set +ex
 # This Laminar bash function records an environment variable in the 
 # \$LAMINAR_VARS file.
 #
@@ -39,7 +40,105 @@ function recordComment {
   echo "# \$*" >> \$LAMINAR_VARS
 }
 #
-VARS_FUNCTIONS
+# This Laminar bash function runs an other bash script and exits the 
+# script if the sub-bash script fails. 
+#
+function failResult {
+  CMD=\$*
+  echo "------------------------------------------------------------"
+  echo \$CMD
+  echo "------------------------------------------------------------"
+  set +e
+  \$CMD
+  echo "------------------------------------------------------------"
+  CMD_RESULT=\$?
+  if test \$CMD_RESULT -ne 0 ; then
+    echo "FAILURE: \$CMD" >> \$LRESULTS_FILE
+    exit \$CMD_RESULT
+  fi
+}
+#
+# This Laminar bash function runs an other bash script and records its 
+# success or failure in a results file for later reporting (and potential 
+# failure). 
+#
+function acceptResult {
+  set +e
+  CMD=\$*
+  echo "------------------------------------------------------------"
+  echo \$CMD
+  echo "------------------------------------------------------------"
+  \$CMD
+  echo "------------------------------------------------------------"
+  CMD_RESULT=\$?
+  if test \$CMD_RESULT -eq 0 ; then
+    echo "SUCCESS: \$CMD" >> \$LRESULTS_FILE
+  else
+    echo "FAILURE: \$CMD" >> \$LRESULTS_FILE
+  fi
+}
+#
+# This Laminar bash function reports the LRESULTS_FILE and exists with an 
+# non-zero error code if any result failed. 
+#
+function reportResults {
+  date >> \$LRESULTS_FILE
+  #
+  # Let the user know what the testOutputResults were
+  #
+  echo ""
+  echo "-------------------------------------------------------"
+  echo "Laminar \$JOB/\$RUN results:"
+  echo "-------------------------------------------------------"
+  cat \$LRESULTS_FILE
+  echo "-------------------------------------------------------"
+  echo ""
+  #
+  # fail the script IF we find the work 'FAILURE' in the testOutputResults
+  #
+  if grep FAILURE \$LRESULTS_FILE ; then 
+    exit 1
+  fi
+}
+#
+# This Luminar bash runction runs a docker run command in a specified 
+# docker container AND runs as the *root* user. 
+#
+function rootDocker {
+  echo dumb-init -v -- docker run --rm -i \
+    -v \$LAMINAR_HOME:\$LAMINAR_HOME      \
+    \$*
+  #
+  dumb-init -v -- docker run --rm -i \
+    -v \$LAMINAR_HOME:\$LAMINAR_HOME \
+    \$*
+}
+#
+export ROOT_DOCKER="dumb-init -v -- docker run --rm -i -v \$LAMINAR_HOME:\$LAMINAR_HOME "
+#
+# This Luminar bash function runs a docker run command in a specified 
+# docker container AND runs as the *dev* user. 
+#
+function devDocker {
+  echo dumb-init -v -- docker run --rm -i \
+    -v \$LAMINAR_HOME:\$LAMINAR_HOME      \
+    -u dev:dev                            \
+    -w "/home/dev"                        \
+    \$*
+  #
+  dumb-init -v -- docker run --rm -i \
+    -v \$LAMINAR_HOME:\$LAMINAR_HOME \
+    -u dev:dev                       \
+    -w "/home/dev"                   \
+    \$*
+}
+#
+export DEV_DOCKER="dumb-init -v -- docker run --rm -i -v \$LAMINAR_HOME:\$LAMINAR_HOME -u dev:dev -w /home/dev "
+#
+######################################################################
+# Now record the exported variables
+#
+LAMINAR_FUNCTIONS
 
 source $LAMINAR_VARS
 
