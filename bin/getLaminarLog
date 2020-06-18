@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# This Laminar bash script gets the text version of a run log for a given 
+# task and run number. 
+
+if test $# -ne 1 ; then
+  echo "usage: getLaminarLog <<jobs-url>>"
+  exit -1
+fi
+
+logDir=$HOME/laminar/tasks/logs
+
+logURL=$(echo $1 | sed 's/jobs/log/' )
+runName=$(echo $logURL | cut -d'/' -f5)
+runNumber=$(echo $logURL | cut -d'/' -f6)
+
+mkdir -p $logDir
+
+wget $logURL                             \
+  -O $logDir/${runName}-${runNumber}.log
+
+less $logDir/${runName}-${runNumber}.log

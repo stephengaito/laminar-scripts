@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# This Laminar bash script removes the laminar/tasks/logs directory
+
+rm -rf $HOME/laminar/tasks/logs

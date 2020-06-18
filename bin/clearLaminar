@@ -7,3 +7,6 @@ sudo rm -rf /home/dev/laminar/tasks/laminar.sqlite
 sudo rm -rf /home/dev/laminar/tasks/archive
 
 sudo rm -rf /home/dev/laminar/tasks/run
+
+sudo rm -rf /home/dev/laminar/tasks/logs
+

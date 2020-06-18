@@ -12,9 +12,9 @@ export SCP_DIR=$LAMINAR_HOME/cfg/scripts
 export BIN_DIR=$HOME/bin
 
 mkdir -p $BIN_DIR
-cp bin/startLaminar            $BIN_DIR
+cp bin/startLaminar*           $BIN_DIR
 cp bin/clearLaminar*           $BIN_DIR
-cp bin/startLaminarBaseDocker  $BIN_DIR 
+cp bin/getLaminar*             $BIN_DIR
 
 mkdir -p $CFG_DIR
 cp cfgs/before                 $CFG_DIR

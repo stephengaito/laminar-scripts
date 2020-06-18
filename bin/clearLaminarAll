@@ -8,4 +8,6 @@ sudo rm -rf /home/dev/laminar/tasks/archive
 
 sudo rm -rf /home/dev/laminar/tasks/run
 
+sudo rm -rf /home/dev/laminar/tasks/logs
+
 sudo rm -rf /home/dev/laminar/tasks/workspaces

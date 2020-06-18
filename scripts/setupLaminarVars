@@ -4,6 +4,8 @@
 # Laminar run. It sets up a number of "standard" environment variables for 
 # use in other scrpits. 
 
+# NOTE we run laminar scripts with set -e (exit immediately on errors) 
+
 # Capture the current directory as the RUNDIR
 #
 export LAMINAR_RUNDIR=$PWD
@@ -22,7 +24,8 @@ export LAMINAR_VARS=$LAMINAR_RUNDIR/reSourceLaminarVars
 #
 rm -rf $LAMINAR_VARS
 cat <<LAMINAR_FUNCTIONS > $LAMINAR_VARS
-set +ex
+set -e
+set +x
 # This Laminar bash function records an environment variable in the 
 # \$LAMINAR_VARS file.
 #
@@ -30,6 +33,7 @@ function recordVar {
   varName=\$1
   shift
   echo "export \$varName=\"\$*\"" >> \$LAMINAR_VARS
+  echo "export \$varName=\"\$*\""
   source \$LAMINAR_VARS
 }
 #
@@ -46,9 +50,9 @@ function recordComment {
 function failResult {
   CMD=\$*
   echo "------------------------------------------------------------"
-  echo \$CMD
+  echo failResult: \$CMD
   echo "------------------------------------------------------------"
-  set +e
+  set -e
   \$CMD
   echo "------------------------------------------------------------"
   CMD_RESULT=\$?
@@ -66,11 +70,12 @@ function acceptResult {
   set +e
   CMD=\$*
   echo "------------------------------------------------------------"
-  echo \$CMD
+  echo acceptResult: \$CMD
   echo "------------------------------------------------------------"
   \$CMD
   echo "------------------------------------------------------------"
   CMD_RESULT=\$?
+  set -e
   if test \$CMD_RESULT -eq 0 ; then
     echo "SUCCESS: \$CMD" >> \$LRESULTS_FILE
   else
@@ -105,35 +110,49 @@ function reportResults {
 # docker container AND runs as the *root* user. 
 #
 function rootDocker {
+  echo "-------------------------------------------------------"
+  echo rootDocker:
   echo dumb-init -v -- docker run --rm -i \
     -v \$LAMINAR_HOME:\$LAMINAR_HOME      \
+    -v \$PWD:/root                        \
+    -w /root                              \
     \$*
+  echo "-------------------------------------------------------"
   #
   dumb-init -v -- docker run --rm -i \
     -v \$LAMINAR_HOME:\$LAMINAR_HOME \
+    -v \$PWD:/root                   \
+    -w /root                         \
     \$*
+  echo "-------------------------------------------------------"
 }
 #
-export ROOT_DOCKER="dumb-init -v -- docker run --rm -i -v \$LAMINAR_HOME:\$LAMINAR_HOME "
+export ROOT_DOCKER="dumb-init -v -- docker run --rm -i -v \$LAMINAR_HOME:\$LAMINAR_HOME -v \$PWD:/root -w /root "
 #
 # This Luminar bash function runs a docker run command in a specified 
 # docker container AND runs as the *dev* user. 
 #
 function devDocker {
+  echo "-------------------------------------------------------"
+  echo devDocker:
   echo dumb-init -v -- docker run --rm -i \
     -v \$LAMINAR_HOME:\$LAMINAR_HOME      \
+    -v \$PWD:/home/dev                    \
     -u dev:dev                            \
     -w "/home/dev"                        \
     \$*
+  echo "-------------------------------------------------------"
   #
   dumb-init -v -- docker run --rm -i \
     -v \$LAMINAR_HOME:\$LAMINAR_HOME \
+    -v \$PWD:/home/dev               \
     -u dev:dev                       \
     -w "/home/dev"                   \
     \$*
+  echo "-------------------------------------------------------"
 }
 #
-export DEV_DOCKER="dumb-init -v -- docker run --rm -i -v \$LAMINAR_HOME:\$LAMINAR_HOME -u dev:dev -w /home/dev "
+export DEV_DOCKER="dumb-init -v -- docker run --rm -i -v \$LAMINAR_HOME:\$LAMINAR_HOME -v \$PWD:/home/dev -u dev:dev -w /home/dev "
 #
 ######################################################################
 # Now record the exported variables
