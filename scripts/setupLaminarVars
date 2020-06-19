@@ -112,14 +112,16 @@ function reportResults {
 function rootDocker {
   echo "-------------------------------------------------------"
   echo rootDocker:
-  echo dumb-init -v -- docker run --rm -i \
-    -v \$LAMINAR_HOME:\$LAMINAR_HOME      \
-    -v \$PWD:/root                        \
-    -w /root                              \
+  echo dumb-init -v -- docker run --rm \
+    -v /etc/timezone:/etc/timezone     \
+    -v \$LAMINAR_HOME:\$LAMINAR_HOME   \
+    -v \$PWD:/root                     \
+    -w /root                           \
     \$*
   echo "-------------------------------------------------------"
   #
-  dumb-init -v -- docker run --rm -i \
+  dumb-init -v -- docker run --rm    \
+    -v /etc/timezone:/etc/timezone   \
     -v \$LAMINAR_HOME:\$LAMINAR_HOME \
     -v \$PWD:/root                   \
     -w /root                         \
@@ -127,7 +129,7 @@ function rootDocker {
   echo "-------------------------------------------------------"
 }
 #
-export ROOT_DOCKER="dumb-init -v -- docker run --rm -i -v \$LAMINAR_HOME:\$LAMINAR_HOME -v \$PWD:/root -w /root "
+export ROOT_DOCKER="dumb-init -v -- docker run --rm -v /etc/timezone:/etc/timezone -v \$LAMINAR_HOME:\$LAMINAR_HOME -v \$PWD:/root -w /root "
 #
 # This Luminar bash function runs a docker run command in a specified 
 # docker container AND runs as the *dev* user. 
@@ -135,15 +137,17 @@ export ROOT_DOCKER="dumb-init -v -- docker run --rm -i -v \$LAMINAR_HOME:\$LAMIN
 function devDocker {
   echo "-------------------------------------------------------"
   echo devDocker:
-  echo dumb-init -v -- docker run --rm -i \
-    -v \$LAMINAR_HOME:\$LAMINAR_HOME      \
-    -v \$PWD:/home/dev                    \
-    -u dev:dev                            \
-    -w "/home/dev"                        \
+  echo dumb-init -v -- docker run --rm \
+    -v /etc/timezone:/etc/timezone     \
+    -v \$LAMINAR_HOME:\$LAMINAR_HOME   \
+    -v \$PWD:/home/dev                 \
+    -u dev:dev                         \
+    -w "/home/dev"                     \
     \$*
   echo "-------------------------------------------------------"
   #
-  dumb-init -v -- docker run --rm -i \
+  dumb-init -v -- docker run --rm    \
+    -v /etc/timezone:/etc/timezone   \
     -v \$LAMINAR_HOME:\$LAMINAR_HOME \
     -v \$PWD:/home/dev               \
     -u dev:dev                       \
@@ -152,7 +156,7 @@ function devDocker {
   echo "-------------------------------------------------------"
 }
 #
-export DEV_DOCKER="dumb-init -v -- docker run --rm -i -v \$LAMINAR_HOME:\$LAMINAR_HOME -v \$PWD:/home/dev -u dev:dev -w /home/dev "
+export DEV_DOCKER="dumb-init -v -- docker run --rm -v /etc/timezone:/etc/timezone -v \$LAMINAR_HOME:\$LAMINAR_HOME -v \$PWD:/home/dev -u dev:dev -w /home/dev "
 #
 ######################################################################
 # Now record the exported variables
