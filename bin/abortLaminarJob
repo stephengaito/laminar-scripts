@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# This bash script aborts a Laminar job
+
+if test $# -ne 1 ; then
+  echo "usage: abortLaminarJob <<jobs-url>>"
+  exit -1
+fi
+
+jobURL=$1
+runName=$(echo $jobURL | cut -d'/' -f5)
+runNumber=$(echo $jobURL | cut -d'/' -f6)
+
+laminarc abort $runName $runNumber

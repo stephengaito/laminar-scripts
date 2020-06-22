@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# This Laminar bash script builds a base Docker image which can be used as 
+# a minimal image for other purposes. 
+
+# It contains, tzdata, git, sudo, docker-cli and the dev user.
+
+# NOTE: we explicitly install tzdata here since, in focal, there is a 
+# complex interaction with the installation of some other packages which 
+# lead to the configuration of tzdata hanging whilc while expecting user 
+# input. 
+
+mkdir dockerDir
+
+cat <<DEV_DOCKER_FILE > dockerDir/Dockerfile
+FROM alpine:$DIST
+MAINTAINER Stephen Gaito
+
+RUN apk update && \
+  apk upgrade && \
+  apk add \
+    tzdata \
+    ca-certificates \
+    git \
+    sudo
+
+RUN adduser -u 4242 -s /bin/sh -D dev dev
+
+RUN echo "dev ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/dev
+
+DEV_DOCKER_FILE
+
+cat dockerDir/Dockerfile
+
+cd dockerDir
+
+docker build -t laminar_dev_$DIST .
+
+cd ..
+
+cat <<ROOT_DOCKER_FILE > dockerDir/Dockerfile
+FROM alpine:$DIST
+MAINTAINER Stephen Gaito
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apk update && \
+  apk upgrade && \
+  apk add \
+    tzdata
+
+ROOT_DOCKER_FILE
+
+cat dockerDir/Dockerfile
+
+cd dockerDir
+
+docker build -t laminar_root_$DIST .
+

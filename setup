@@ -13,6 +13,8 @@ export BIN_DIR=$HOME/bin
 
 mkdir -p $BIN_DIR
 cp bin/startLaminar*           $BIN_DIR
+cp bin/abortLaminar*           $BIN_DIR
+cp bin/monitorLaminar*         $BIN_DIR
 cp bin/clearLaminar*           $BIN_DIR
 cp bin/getLaminar*             $BIN_DIR
 
@@ -22,7 +24,7 @@ cp cfgs/before                 $CFG_DIR
 mkdir -p $JOB_DIR
 cp jobs/dockerExample.run      $JOB_DIR
 cp jobs/hello.run              $JOB_DIR
-cp jobs/buildDockerBase.run    $JOB_DIR 
+cp jobs/buildDocker*Base.run   $JOB_DIR 
 
 mkdir -p $SCP_DIR
 #cp scripts/*Docker             $SCP_DIR

@@ -35,7 +35,7 @@ echo "-----------------------------------------"
 
 # Now run the docker image
 #
-dumb-init -v docker run --rm    \
+docker run --rm                 \
   -v $PWD:/root                 \
   -v $WORKSPACE:/root/workspace \
   -v $ARCHIVE:/root/archive     \
