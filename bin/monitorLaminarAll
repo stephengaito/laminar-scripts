@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# This bash script runs two top's and a monitorLaminarInScreen inside a 
+# split screen session. One top monitors docker-root and the other top 
+# monitors the dev user, and the monitorLaminarInScreen monitors the 
+# Laminar queue and running task. 
+
+cat <<SCREENRC > /tmp/monitorLaminarScreenRC
+# This screenrc file runs two top's inside a split screen session.
+# The upper top monitors docker-root.
+# The lower top monitors the dev user.
+#
+screen top -1 -u docker-root
+split
+focus
+screen top -1 -u dev
+split
+focus
+screen monitorLaminarInScreen
+#
+SCREENRC
+
+exec screen -c /tmp/monitorLaminarScreenRC
