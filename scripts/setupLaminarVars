@@ -107,6 +107,27 @@ function reportResults {
 }
 #
 # This Luminar bash runction runs a docker run command in a specified 
+# docker container with no changes in user or workDir.
+#
+function baseDocker {
+  echo "-------------------------------------------------------"
+  echo baseDocker:
+  echo docker run --rm                 \
+    -v /etc/timezone:/etc/timezone     \
+    -v \$LAMINAR_HOME:\$LAMINAR_HOME   \
+    \$*
+  echo "-------------------------------------------------------"
+  #
+  docker run --rm                    \
+    -v /etc/timezone:/etc/timezone   \
+    -v \$LAMINAR_HOME:\$LAMINAR_HOME \
+    \$*
+  echo "-------------------------------------------------------"
+}
+#
+export BASE_DOCKER="docker run --rm -v /etc/timezone:/etc/timezone -v \$LAMINAR_HOME:\$LAMINAR_HOME "
+#
+# This Luminar bash runction runs a docker run command in a specified 
 # docker container AND runs as the *root* user. 
 #
 function rootDocker {
