@@ -1,18 +1,18 @@
 #!/bin/bash
 
-# This Laminar bash script builds a base Docker image which can be used as 
+# This Laminar bash script builds a base Podman image which can be used as 
 # a minimal image for other purposes. 
 
-# It contains, tzdata, git, sudo, docker-cli and the dev user.
+# It contains, tzdata, git, sudo, podman-cli and the dev user.
 
 # NOTE: we explicitly install tzdata here since, in focal, there is a 
 # complex interaction with the installation of some other packages which 
 # lead to the configuration of tzdata hanging whilc while expecting user 
 # input. 
 
-mkdir dockerDir
+mkdir podmanDir
 
-cat <<DEV_DOCKER_FILE > dockerDir/Dockerfile
+cat <<DEV_PODMAN_FILE > podmanDir/Containerfile
 FROM alpine:$DIST
 MAINTAINER Stephen Gaito
 
@@ -24,21 +24,24 @@ RUN apk update && \
     git \
     sudo
 
-RUN adduser -u 4242 -s /bin/sh -D dev dev
+RUN echo "dev:x:0:" >> /etc/group && \
+  echo "dev:x:0:0::/home/dev:/bin/sh" >> /etc/passwd && \
+  mkdir -p /home/dev && \
+  passwd -d dev
 
 RUN echo "dev ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/dev
 
-DEV_DOCKER_FILE
+DEV_PODMAN_FILE
 
-cat dockerDir/Dockerfile
+cat podmanDir/Containerfile
 
-cd dockerDir
+cd podmanDir
 
-docker build -t laminar_dev_$DIST .
+podman build -t laminar_dev_$DIST .
 
 cd ..
 
-cat <<ROOT_DOCKER_FILE > dockerDir/Dockerfile
+cat <<ROOT_PODMAN_FILE > podmanDir/Containerfile
 FROM alpine:$DIST
 MAINTAINER Stephen Gaito
 
@@ -49,11 +52,11 @@ RUN apk update && \
   apk add \
     tzdata
 
-ROOT_DOCKER_FILE
+ROOT_PODMAN_FILE
 
-cat dockerDir/Dockerfile
+cat podmanDir/Containerfile
 
-cd dockerDir
+cd podmanDir
 
-docker build -t laminar_root_$DIST .
+podman build -t laminar_root_$DIST .
 

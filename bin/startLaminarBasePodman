@@ -1,0 +1,76 @@
+#!/bin/bash
+
+# This bash script starts building a collection of base podman images for 
+# use by Laminar. 
+
+echo ""
+echo "-----------------------------------------------------------------"
+echo ""
+DIST=bionic
+if podman image list --all | grep -q laminar_root_$DIST ; then
+  echo podman image rm laminar_root_$DIST
+  podman image rm laminar_root_$DIST
+fi
+echo ""
+if podman image list --all | grep -q laminar_dev_$DIST ; then
+  echo podman image rm laminar_dev_$DIST
+  podman image rm laminar_dev_$DIST
+fi
+echo ""
+echo laminarc queue buildPodmanUbuntuBase DIST=$DIST
+laminarc queue buildPodmanUbuntuBase DIST=$DIST
+
+echo ""
+echo "-----------------------------------------------------------------"
+echo ""
+DIST=eoan
+if podman image list --all | grep -q laminar_root_$DIST ; then
+  echo podman image rm laminar_root_$DIST
+  podman image rm laminar_root_$DIST
+fi
+echo ""
+if podman image list --all | grep -q laminar_dev_$DIST ; then
+  echo podman image rm laminar_dev_$DIST
+  podman image rm laminar_dev_$DIST
+fi
+echo ""
+echo laminarc queue buildPodmanUbuntuBase DIST=$DIST
+laminarc queue buildPodmanUbuntuBase DIST=$DIST
+
+echo ""
+echo "-----------------------------------------------------------------"
+echo ""
+DIST=focal
+if podman image list --all | grep -q laminar_root_$DIST ; then
+  echo podman image rm laminar_root_$DIST
+  podman image rm laminar_root_$DIST
+fi
+echo ""
+if podman image list --all | grep -q laminar_dev_$DIST ; then
+  echo podman image rm laminar_dev_$DIST
+  podman image rm laminar_dev_$DIST
+fi
+echo ""
+echo laminarc queue buildPodmanUbuntuBase DIST=$DIST
+laminarc queue buildPodmanUbuntuBase DIST=$DIST
+
+echo ""
+echo "-----------------------------------------------------------------"
+echo ""
+DIST=3.12
+if podman image list --all | grep -q laminar_root_$DIST ; then
+  echo podman image rm laminar_root_$DIST
+  podman image rm laminar_root_$DIST
+fi
+echo ""
+if podman image list --all | grep -q laminar_dev_$DIST ; then
+  echo podman image rm laminar_dev_$DIST
+  podman image rm laminar_dev_$DIST
+fi
+echo ""
+echo laminarc queue buildPodmanAlpineBase DIST=$DIST
+laminarc queue buildPodmanAlpineBase DIST=$DIST
+
+echo ""
+echo "-----------------------------------------------------------------"
+echo ""

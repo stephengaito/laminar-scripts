@@ -12,7 +12,7 @@ So two ways of shortening the run-time of my jobs is to:
   echo 'Acquire::http { Proxy "http://<<yourServerIP>>:3142"; };' > /etc/apt/apt.conf.d/00aptcacher && \
 ```
 
-*before* any apt commands in your `Dockerfile`s.
+*before* any apt commands in your `Dockerfile`/`Containerfile`s.
 
 2. Rewrite any `git clone`s in your job scripts to add:
 

@@ -1,51 +1,39 @@
-# Using Docker containers inside a Laminar job
+# Using OCI containers inside a Laminar job
+
+I have recently abandoned the use of docker (and its daemon running as 
+root) and instead use the [Podman](https://podman.io/) tool in rootless 
+mode as an (almost) direct replacement of docker. Among other things, 
+podman can be used inside podman (though I have not yet tested this). 
 
 The [Laminar documentation](https://laminar.ohwg.net/docs.html) contains a 
-section on [using docker](https://laminar.ohwg.net/docs.html#Docker-container-jobs)
-in a Laminar job. In the use case shown, shell commands are *piped* into 
-the docker container. This works very well *if* you are only piping shell 
-commands into docker. This can admitedly represent a very large collection 
-of uses. If this matches your needs... use it. 
+section on [using 
+docker](https://laminar.ohwg.net/docs.html#Docker-container-jobs) in a 
+Laminar job. In the use case shown, shell commands are *piped* into the 
+OCI container. 
 
-However *if* you are using a docker image which wraps some other program, 
-either directly or via a shell script to be run by docker, unless you are 
-very lucky, you will find that your Laminar job never completes and you 
-have defunct docker processes. This is because there is no 'PID-1' aware 
-process which notices that docker has completed and cleans up. 
-
-I have found that *wrapping* the `docker run` command in a 'PID-1' aware 
-program, such as [`dumb-init`](https://github.com/Yelp/dumb-init) solves 
-the problem. Using `dumb-init -v` provides additional output which 
-helps distinguish what is happening. 
-
-[Dumb-init](https://github.com/Yelp/dumb-init) is a single C source file,
-and is very easy to build and install. You can get it here: 
+Instead of pipping commands, for my use, the standard podman run typically 
+is: 
 
 ```
-    https://github.com/Yelp/dumb-init
-```
-
-For my use, the standard docker run typically is:
-
-```
-dumb-init -v docker run --rm      \
+podman run --rm                   \
   -v $PWD:/home/dev               \
   -v $PWORKSPACE/$DIST:/workspace \
   -v $ARCHIVE/$RUN:/archive       \
   -u dev:dev                      \
   -w "/home/dev"                  \
   laminar_:$DIST                  \
-  /root/dockerScript
+  /root/aScript
 ```
 
-Where `/root/dockerScript` is the script required to install all 
+Where `/root/aScript` is the script required to install all 
 dependencies and build or run the required job. 
 
-As another example, here is how I *test* the docker version of the 
-[pdf2htmlEX]() tool I help develop: 
+As another example, here is how I *test* the OCI containerized version of 
+the [pdf2htmlEX](https://github.com/pdf2htmlEX/pdf2htmlEX) tool I help 
+develop: 
 
 ```
-dumb-init -v docker run --rm -i                                   \
+podman run --rm -i                                                \
   -v $PWD:/home/dev                                               \
   -v $PWORKSPACE/$DIST:/workspace                                 \
   -v $ARCHIVE:/archive                                            \
@@ -60,27 +48,21 @@ dumb-init -v docker run --rm -i                                   \
   $PDF_PATH.pdf
 ```
 
-Note that since the `pdf2htmlEX` application is not 'PID-1' aware, running 
-this command with out the `dumb-init` wrapper, results in defunct docker 
-processes and Laminar jobs which never complete. 
-
----
-
 Alternatively:
 
 ```
-docker run --rm -i               \
+podman run --rm -i               \
   -v $PWD:/home/dev              \
   -v $WORKSPACE/$DIST:/workspace \
   -v $ARCHIVE/$RUN:/archive      \
   -u dev:dev                     \
   -w "/home/dev"                 \
-  laminar_:$DIST                 <<DOCKER_SCRIPT
+  laminar_:$DIST                 <<PODMAN_SCRIPT
 
 
-DOCKER_SCRIPT
+PODMAN_SCRIPT
 ```
 
-works by piping the commands to the docker image's shell command, as 
+works by piping the commands to the podman image's shell command, as 
 suggested by [Laminar's 
 documenation](https://laminar.ohwg.net/docs.html#Docker-container-jobs) 

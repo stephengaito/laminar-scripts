@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# This Laminar bash script builds a base Podman image which can be used as 
+# a minimal image for other purposes. 
+
+# It contains, tzdata, git, sudo, podman-cli and the dev user.
+
+# NOTE: we explicitly install tzdata here since, in focal, there is a 
+# complex interaction with the installation of some other packages which 
+# lead to the configuration of tzdata hanging whilc while expecting user 
+# input. 
+
+mkdir podmanDir
+
+cat <<DEV_PODMAN_FILE > podmanDir/Containerfile
+FROM ubuntu:$DIST
+MAINTAINER Stephen Gaito
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN echo 'Acquire::http { Proxy "http://10.0.0.1:3142"; };' > /etc/apt/apt.conf.d/00aptcacher && \
+  apt update && \
+  apt -y upgrade && \
+  apt -y --no-install-recommends install \
+    tzdata \
+    ca-certificates \
+    passwd \
+    git \
+    sudo
+
+# Podman actually runs as root==host-user ...
+#
+# so running as root is most convenient when we want to access the build 
+# results outside the container... 
+#
+# So we just fake a `dev` user who is... just root (inside the container)...
+#
+RUN groupadd --non-unique --gid 0 dev && \
+  useradd --non-unique --create-home --uid 0 --gid 0 --groups sudo dev --shell /bin/bash
+
+RUN echo "dev ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/dev
+
+DEV_PODMAN_FILE
+
+cat podmanDir/Containerfile
+
+cd podmanDir
+
+podman build -t laminar_dev_$DIST .
+
+cd ..
+
+cat <<ROOT_PODMAN_FILE > podmanDir/Containerfile
+FROM ubuntu:$DIST
+MAINTAINER Stephen Gaito
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN echo 'Acquire::http { Proxy "http://10.0.0.1:3142"; };' > /etc/apt/apt.conf.d/00aptcacher && \
+  apt update && \
+  apt -y upgrade && \
+  apt -y --no-install-recommends install \
+    tzdata
+
+#  apt -y upgrade && \
+#  apt -y --no-install-recommends install \
+
+ROOT_PODMAN_FILE
+
+cat podmanDir/Containerfile
+
+cd podmanDir
+
+podman build -t laminar_root_$DIST .
+

@@ -1,8 +1,0 @@
-#!/bin/bash
-
-# This bash script runs a docker run command in a specified docker 
-# container AND runs as the *root* user. 
-
-docker run --rm -i                 \
-  -v $LAMINAR_HOME:$LAMINAR_HOME   \
-  $*

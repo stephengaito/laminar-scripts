@@ -5,12 +5,12 @@ echo "  ARCHIVE=[$ARCHIVE]"
 echo "      RUN=[$RUN]"
 echo " TEST_ENV=[$TEST_ENV]"
 
-# We start by creating the script used to control the docker image
+# We start by creating the script used to control the podman image
 #
-cat <<DOCKER_SCRIPT > dockerScript
+cat <<PODMAN_SCRIPT > podmanScript
 #!/bin/bash -xe
 
-# This bash script is used *inside* a docker image to build pdf2htmlEX.
+# This bash script is used *inside* a podman image to build pdf2htmlEX.
 
 echo "WORKSPACE=[$WORKSPACE]"
 echo "  ARCHIVE=[$ARCHIVE]"
@@ -20,26 +20,26 @@ export TEST_ENV=${TEST_ENV:=silly}
 echo " TEST_ENV=[$TEST_ENV]"
 
 # we start by doing something simple
-echo "Hello from dockerExample.run in Laminar!"
+echo "Hello from podmanExample.run in Laminar!"
 
 # Now try failing
 /bin/thisCommandShouldNotExist
 
-DOCKER_SCRIPT
+PODMAN_SCRIPT
 
-chmod a+x dockerScript
+chmod a+x podmanScript
 
 echo "-----------------------------------------"
-cat dockerScript
+cat podmanScript
 echo "-----------------------------------------"
 
 # Now run the docker image
 #
-docker run --rm                 \
+podman run --rm                 \
   -v $PWD:/root                 \
   -v $WORKSPACE:/root/workspace \
   -v $ARCHIVE:/root/archive     \
   ubuntu:bionic                 \
-  /root/dockerScript
+  /root/podmanScript
 
 echo "I am done!"

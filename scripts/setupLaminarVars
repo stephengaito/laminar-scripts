@@ -106,34 +106,34 @@ function reportResults {
   fi
 }
 #
-# This Luminar bash runction runs a docker run command in a specified 
-# docker container with no changes in user or workDir.
+# This Luminar bash runction runs a podman run command in a specified 
+# podman container with no changes in user or workDir.
 #
-function baseDocker {
+function basePodman {
   echo "-------------------------------------------------------"
-  echo baseDocker:
-  echo docker run --rm                 \
+  echo basePodman:
+  echo dumb-init -v -- podman run --rm \
     -v /etc/timezone:/etc/timezone     \
     -v \$LAMINAR_HOME:\$LAMINAR_HOME   \
     \$*
   echo "-------------------------------------------------------"
   #
-  docker run --rm                    \
+  dumb-init -v -- podman run --rm    \
     -v /etc/timezone:/etc/timezone   \
     -v \$LAMINAR_HOME:\$LAMINAR_HOME \
     \$*
   echo "-------------------------------------------------------"
 }
 #
-export BASE_DOCKER="docker run --rm -v /etc/timezone:/etc/timezone -v \$LAMINAR_HOME:\$LAMINAR_HOME "
+export BASE_PODMAN="dumb-init -v -- podman run --rm -v /etc/timezone:/etc/timezone -v \$LAMINAR_HOME:\$LAMINAR_HOME "
 #
-# This Luminar bash runction runs a docker run command in a specified 
-# docker container AND runs as the *root* user. 
+# This Luminar bash runction runs a podman run command in a specified 
+# podman container AND runs as the *root* user. 
 #
-function rootDocker {
+function rootPodman {
   echo "-------------------------------------------------------"
-  echo rootDocker:
-  echo docker run --rm                 \
+  echo rootPodman:
+  echo dumb-init -v -- podman run --rm \
     -v /etc/timezone:/etc/timezone     \
     -v \$LAMINAR_HOME:\$LAMINAR_HOME   \
     -v \$PWD:/root                     \
@@ -141,7 +141,7 @@ function rootDocker {
     \$*
   echo "-------------------------------------------------------"
   #
-  docker run --rm                    \
+  dumb-init -v -- podman run --rm    \
     -v /etc/timezone:/etc/timezone   \
     -v \$LAMINAR_HOME:\$LAMINAR_HOME \
     -v \$PWD:/root                   \
@@ -150,15 +150,15 @@ function rootDocker {
   echo "-------------------------------------------------------"
 }
 #
-export ROOT_DOCKER="docker run --rm -v /etc/timezone:/etc/timezone -v \$LAMINAR_HOME:\$LAMINAR_HOME -v \$PWD:/root -w /root "
+export ROOT_PODMAN="dumb-init -v -- podman run --rm -v /etc/timezone:/etc/timezone -v \$LAMINAR_HOME:\$LAMINAR_HOME -v \$PWD:/root -w /root "
 #
-# This Luminar bash function runs a docker run command in a specified 
-# docker container AND runs as the *dev* user. 
+# This Luminar bash function runs a podman run command in a specified 
+# podman container AND runs as the *dev* user. 
 #
-function devDocker {
+function devPodman {
   echo "-------------------------------------------------------"
-  echo devDocker:
-  echo docker run --rm                 \
+  echo devPodman:
+  echo dumb-init -v -- podman run --rm \
     -v /etc/timezone:/etc/timezone     \
     -v \$LAMINAR_HOME:\$LAMINAR_HOME   \
     -v \$PWD:/home/dev                 \
@@ -167,7 +167,7 @@ function devDocker {
     \$*
   echo "-------------------------------------------------------"
   #
-  docker run --rm                    \
+  dumb-init -v -- podman run --rm    \
     -v /etc/timezone:/etc/timezone   \
     -v \$LAMINAR_HOME:\$LAMINAR_HOME \
     -v \$PWD:/home/dev               \
@@ -177,7 +177,7 @@ function devDocker {
   echo "-------------------------------------------------------"
 }
 #
-export DEV_DOCKER="docker run --rm -v /etc/timezone:/etc/timezone -v \$LAMINAR_HOME:\$LAMINAR_HOME -v \$PWD:/home/dev -u dev:dev -w /home/dev "
+export DEV_PODMAN="dumb-init -v -- podman run --rm -v /etc/timezone:/etc/timezone -v \$LAMINAR_HOME:\$LAMINAR_HOME -v \$PWD:/home/dev -u dev:dev -w /home/dev "
 #
 ######################################################################
 # Now record the exported variables
