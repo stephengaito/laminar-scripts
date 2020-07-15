@@ -8,7 +8,7 @@ if test $# -ne 1 ; then
   exit -1
 fi
 
-logDir=$HOME/laminar/tasks/logs
+logDir=$HOME/tasks/logs
 
 logURL=$(echo $1 | sed 's/jobs/log/' )
 runName=$(echo $logURL | cut -d'/' -f5)

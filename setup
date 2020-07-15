@@ -8,6 +8,7 @@ source laminar.conf
 export CFG_DIR=$LAMINAR_HOME/cfg
 export JOB_DIR=$LAMINAR_HOME/cfg/jobs
 export SCP_DIR=$LAMINAR_HOME/cfg/scripts
+export CTX_DIR=$LAMINAR_HOME/cfg/contexts
 
 export BIN_DIR=$HOME/bin
 
@@ -28,4 +29,5 @@ cp jobs/buildPodman*Base.run   $JOB_DIR
 mkdir -p $SCP_DIR
 cp scripts/setupLaminarVars    $SCP_DIR
 
-ln -fs $LAMINAR_BIN/laminarc   $BIN_DIR/laminarc
+mkdir -p $CTX_DIR
+cp contexts/*                  $CTX_DIR

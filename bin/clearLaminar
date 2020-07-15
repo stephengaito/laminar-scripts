@@ -2,11 +2,11 @@
 
 # This bash script resets/clears out laminar...
 
-rm -rf /home/dev/laminar/tasks/laminar.sqlite
+rm -rf /home/laminar/tasks/laminar.sqlite
 
-rm -rf /home/dev/laminar/tasks/archive
+rm -rf /home/laminar/tasks/archive
 
-rm -rf /home/dev/laminar/tasks/run
+rm -rf /home/laminar/tasks/run
 
-rm -rf /home/dev/laminar/tasks/logs
+rm -rf /home/laminar/tasks/logs
 

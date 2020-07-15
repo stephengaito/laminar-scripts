@@ -65,40 +65,17 @@ Git clone laminar:
   cd laminar
 ```
 
-Note that we specifically build and install locally into the dev user's 
-laminar directory. 
-
-Update laminar/CMakeLists.txt file:
-
-```
---- CMakeLists.txt.orig	2020-07-07 09:12:02.762069806 +0100
-+++ CMakeLists.txt	2020-07-07 09:19:48.648156986 +0100
-@@ -133,9 +133,9 @@
- set(ZSH_COMPLETIONS_DIR /usr/share/zsh/site-functions CACHE PATH "Path to zsh completions directory")
- install(TARGETS laminard RUNTIME DESTINATION sbin)
- install(TARGETS laminarc RUNTIME DESTINATION bin)
--install(FILES etc/laminar.conf DESTINATION /etc)
--install(FILES etc/laminarc-completion.bash DESTINATION ${BASH_COMPLETIONS_DIR} RENAME laminarc)
--install(FILES etc/laminarc-completion.zsh DESTINATION ${ZSH_COMPLETIONS_DIR} RENAME _laminarc)
-+install(FILES etc/laminar.conf DESTINATION ${CMAKE_INSTALL_PREFIX}/etc)
-+install(FILES etc/laminarc-completion.bash DESTINATION ${CMAKE_INSTALL_PREFIX}/${BASH_COMPLETIONS_DIR} RENAME laminarc)
-+install(FILES etc/laminarc-completion.zsh DESTINATION ${CMAKE_INSTALL_PREFIX}/${ZSH_COMPLETIONS_DIR} RENAME _laminarc)
- 
- configure_file(etc/laminar.service.in laminar.service @ONLY)
--install(FILES ${CMAKE_CURRENT_BINARY_DIR}/laminar.service DESTINATION ${SYSTEMD_UNITDIR})
-+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/laminar.service DESTINATION ${CMAKE_INSTALL_PREFIX}/${SYSTEMD_UNITDIR})
-```
-
 Then build:
 
 ```
+  mkdir build
   cd build
-  cmake                                          \
-        -DCMAKE_BUILD_TYPE=Release               \
-        -DCMAKE_INSTALL_PREFIX=/home/dev/laminar \
+  cmake                                   \
+        -DCMAKE_BUILD_TYPE=Release        \
+        -DCMAKE_INSTALL_PREFIX=/usr/local \
         ..
   make -j2
-  make install
+  sudo make install
 ```
 
 ### Installing laminar-scripts

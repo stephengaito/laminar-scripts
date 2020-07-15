@@ -15,13 +15,13 @@ Instead of pipping commands, for my use, the standard podman run typically
 is: 
 
 ```
-podman run --rm                   \
-  -v $PWD:/home/dev               \
+dumb-init -v -- podman run --rm   \
+  -v $PWD:/home/root              \
   -v $PWORKSPACE/$DIST:/workspace \
   -v $ARCHIVE/$RUN:/archive       \
-  -u dev:dev                      \
-  -w "/home/dev"                  \
-  laminar_:$DIST                  \
+  -u root:root                    \
+  -w "/home/root"                 \
+  laminar_$DIST                   \
   /root/aScript
 ```
 
@@ -33,31 +33,31 @@ the [pdf2htmlEX](https://github.com/pdf2htmlEX/pdf2htmlEX) tool I help
 develop: 
 
 ```
-podman run --rm -i                                                \
-  -v $PWD:/home/dev                                               \
-  -v $PWORKSPACE/$DIST:/workspace                                 \
-  -v $ARCHIVE:/archive                                            \
-  -v /home/dev/pdf2htmlexWork/examples:/examples:ro               \
-  -v /home/dev/pdf2htmlexWork/pdf2htmlEX/pdf2htmlEX/test:/test:ro \
-  pdf2htmlex/pdf2htmlex:latest                                    \
-  --zoom 1.3                                                      \
-  --embed cfij --bg-format $bgFormat                              \
-  --split-pages 1                                                 \
-  --dest-dir $PDF_BASE_DIR                                        \
-  --page-filename $PDF_NAME-%d.page                               \
+dumb-init -v -- podman run --rm -i                                 \
+  -v $PWD:/home/root                                               \
+  -v $PWORKSPACE/$DIST:/workspace                                  \
+  -v $ARCHIVE:/archive                                             \
+  -v /home/root/pdf2htmlexWork/examples:/examples:ro               \
+  -v /home/root/pdf2htmlexWork/pdf2htmlEX/pdf2htmlEX/test:/test:ro \
+  pdf2htmlex/pdf2htmlex:latest                                     \
+  --zoom 1.3                                                       \
+  --embed cfij --bg-format $bgFormat                               \
+  --split-pages 1                                                  \
+  --dest-dir $PDF_BASE_DIR                                         \
+  --page-filename $PDF_NAME-%d.page                                \
   $PDF_PATH.pdf
 ```
 
 Alternatively:
 
 ```
-podman run --rm -i               \
-  -v $PWD:/home/dev              \
-  -v $WORKSPACE/$DIST:/workspace \
-  -v $ARCHIVE/$RUN:/archive      \
-  -u dev:dev                     \
-  -w "/home/dev"                 \
-  laminar_:$DIST                 <<PODMAN_SCRIPT
+dumb-init -v -- podman run --rm -i \
+  -v $PWD:/home/root               \
+  -v $WORKSPACE/$DIST:/workspace   \
+  -v $ARCHIVE/$RUN:/archive        \
+  -u root:root                     \
+  -w "/home/root"                  \
+  laminar_:$DIST                   <<PODMAN_SCRIPT
 
 
 PODMAN_SCRIPT

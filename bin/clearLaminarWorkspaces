@@ -2,4 +2,4 @@
 
 # This bash script resets/clears out laminar...
 
-rm -rf /home/dev/laminar/tasks/workspaces
+rm -rf /home/laminar/tasks/workspaces

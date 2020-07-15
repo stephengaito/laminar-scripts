@@ -152,33 +152,6 @@ function rootPodman {
 #
 export ROOT_PODMAN="dumb-init -v -- podman run --rm -v /etc/timezone:/etc/timezone -v \$LAMINAR_HOME:\$LAMINAR_HOME -v \$PWD:/root -w /root "
 #
-# This Luminar bash function runs a podman run command in a specified 
-# podman container AND runs as the *dev* user. 
-#
-function devPodman {
-  echo "-------------------------------------------------------"
-  echo devPodman:
-  echo dumb-init -v -- podman run --rm \
-    -v /etc/timezone:/etc/timezone     \
-    -v \$LAMINAR_HOME:\$LAMINAR_HOME   \
-    -v \$PWD:/home/dev                 \
-    -u dev:dev                         \
-    -w "/home/dev"                     \
-    \$*
-  echo "-------------------------------------------------------"
-  #
-  dumb-init -v -- podman run --rm    \
-    -v /etc/timezone:/etc/timezone   \
-    -v \$LAMINAR_HOME:\$LAMINAR_HOME \
-    -v \$PWD:/home/dev               \
-    -u dev:dev                       \
-    -w "/home/dev"                   \
-    \$*
-  echo "-------------------------------------------------------"
-}
-#
-export DEV_PODMAN="dumb-init -v -- podman run --rm -v /etc/timezone:/etc/timezone -v \$LAMINAR_HOME:\$LAMINAR_HOME -v \$PWD:/home/dev -u dev:dev -w /home/dev "
-#
 ######################################################################
 # Now record the exported variables
 #

@@ -31,26 +31,11 @@ The main `setupLaminarVars` script contains the following bash functions:
   directly to the `podman container`. 
 
 ```
-    podman run --rm                  \
+    dumb-init -v -- podman run --rm  \
       -v /etc/timezone:/etc/timezone \
       -v $LAMINAR_HOME:$LAMINAR_HOME \
       $*
 
-```
-
-- `devPodman` runs a `podman run` command with an internal `dev:dev` 
-  user/group in the `/home/dev` working directory. Any command arguments 
-  are appended to the `podman run` command as further arguments. Stdin is 
-  piped directly to the `podman container`.
-
-```
-    podman run --rm -i                             \
-      -v $PWD:/home/dev                            \
-      -v $PWORKSPACE/$DIST:/workspace              \
-      -v $ARCHIVE:/archive                         \
-      -u dev:dev                                   \
-      -w "/home/dev"                               \
-      $*
 ```
 
 - `rootPodman` runs a `podman run` command with the standard `root:root` 
@@ -59,10 +44,10 @@ The main `setupLaminarVars` script contains the following bash functions:
   piped directly to the `podman container`. 
 
 ```
-    podman run --rm -i                             \
-      -v $PWD:/home/dev                            \
-      -v $PWORKSPACE/$DIST:/workspace              \
-      -v $ARCHIVE:/archive                         \
+    dumb-init -v -- podman run --rm -i \
+      -v $PWD:/home/root               \
+      -v $PWORKSPACE/$DIST:/workspace  \
+      -v $ARCHIVE:/archive             \
       $*
 ```
 
@@ -84,7 +69,3 @@ The main `setupLaminarVars` script contains the following bash functions:
 
 - `ROOT_PODMAN` an environment variable version of the `rootPodman` bash
   function.
-
-- `DEV_PODMAN` an environment variable version of the `devPodman` bash 
-  function. 
-

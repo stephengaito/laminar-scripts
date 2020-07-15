@@ -2,7 +2,7 @@
 
 # This bash script setups and runs laminar
 
-export LAMINAR_HOME=/home/dev/laminar/tasks
+export LAMINAR_HOME=/home/laminar/tasks
 export LAMINAR_BIND_HTTP=*:8888
 export LAMINAR_TITLE="PerceptiSys Laminar CI"
 export LAMINAR_KEEP_RUNDIRS=5
@@ -25,6 +25,6 @@ echo ""
 echo "Type Ctrl-C to exit"
 echo ""
 
-/home/dev/laminar/usr/sbin/laminard
+/usr/local/sbin/laminard
 
 echo ""

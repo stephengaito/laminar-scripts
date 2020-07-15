@@ -12,35 +12,6 @@
 
 mkdir podmanDir
 
-cat <<DEV_PODMAN_FILE > podmanDir/Containerfile
-FROM alpine:$DIST
-MAINTAINER Stephen Gaito
-
-RUN apk update && \
-  apk upgrade && \
-  apk add \
-    tzdata \
-    ca-certificates \
-    git \
-    sudo
-
-RUN echo "dev:x:0:" >> /etc/group && \
-  echo "dev:x:0:0::/home/dev:/bin/sh" >> /etc/passwd && \
-  mkdir -p /home/dev && \
-  passwd -d dev
-
-RUN echo "dev ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/dev
-
-DEV_PODMAN_FILE
-
-cat podmanDir/Containerfile
-
-cd podmanDir
-
-podman build -t laminar_dev_$DIST .
-
-cd ..
-
 cat <<ROOT_PODMAN_FILE > podmanDir/Containerfile
 FROM alpine:$DIST
 MAINTAINER Stephen Gaito
@@ -49,8 +20,10 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apk update && \
   apk upgrade && \
-  apk add \
-    tzdata
+  apk add  \
+    tzdata \
+    git    \
+    sudo
 
 ROOT_PODMAN_FILE
 
@@ -58,5 +31,5 @@ cat podmanDir/Containerfile
 
 cd podmanDir
 
-podman build -t laminar_root_$DIST .
+dumb-init -v -- podman build -t laminar_$DIST .
 
