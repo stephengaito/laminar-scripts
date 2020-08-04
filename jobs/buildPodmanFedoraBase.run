@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# This Laminar bash script builds a base Podman image which can be used as 
+# a minimal image for other purposes. 
+
+# It contains, tzdata, git, sudo, podman-cli and the dev user.
+
+# NOTE: we explicitly install tzdata here since, in focal, there is a 
+# complex interaction with the installation of some other packages which 
+# lead to the configuration of tzdata hanging whilc while expecting user 
+# input. 
+
+mkdir podmanDir
+
+cat <<ROOT_PODMAN_FILE > podmanDir/Containerfile
+FROM fedora:$DIST
+MAINTAINER Stephen Gaito
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN dnf -y upgrade && \
+  dnf -y --setopt=install_weak_deps=False install \
+    tzdata \
+    git    \
+    sudo
+
+#  apt -y upgrade && \
+#  apt -y --no-install-recommends install \
+
+ROOT_PODMAN_FILE
+
+cat podmanDir/Containerfile
+
+cd podmanDir
+
+dumb-init -v -- podman build -t laminar_$DIST .
+

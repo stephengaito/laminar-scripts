@@ -23,7 +23,7 @@ laminarc queue buildPodmanUbuntuBase DIST=$DIST
 echo ""
 echo "-----------------------------------------------------------------"
 echo ""
-DIST=eoan
+DIST=focal
 if podman image list --all | grep -q laminar_root_$DIST ; then
   echo podman image rm laminar_root_$DIST
   podman image rm laminar_root_$DIST
@@ -40,7 +40,7 @@ laminarc queue buildPodmanUbuntuBase DIST=$DIST
 echo ""
 echo "-----------------------------------------------------------------"
 echo ""
-DIST=focal
+DIST=32
 if podman image list --all | grep -q laminar_root_$DIST ; then
   echo podman image rm laminar_root_$DIST
   podman image rm laminar_root_$DIST
@@ -51,8 +51,12 @@ if podman image list --all | grep -q laminar_dev_$DIST ; then
   podman image rm laminar_dev_$DIST
 fi
 echo ""
-echo laminarc queue buildPodmanUbuntuBase DIST=$DIST
-laminarc queue buildPodmanUbuntuBase DIST=$DIST
+echo laminarc queue buildPodmanFedoraBase DIST=$DIST
+laminarc queue buildPodmanFedoraBase DIST=$DIST
+
+echo ""
+echo "-----------------------------------------------------------------"
+echo ""
 
 echo ""
 echo "-----------------------------------------------------------------"
