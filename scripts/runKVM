@@ -1,0 +1,131 @@
+#!/bin/bash
+
+# This bash scrpit uses cloud-localds, qemu-img and virt-install to run a 
+# bash script inside a newly built KVM instance. 
+
+# The following is based upon:
+#   https://www.theurbanpenguin.com/using-cloud-images-in-kvm/
+
+if [ $# -ne 1 ] ; then
+  echo "usage: runKVM <imageName>"
+  echo ""
+  echo "environment variables:"
+  echo "  DIST : the distribution name of the image to start"
+  echo ""
+  exit -1
+fi
+
+imageName=$1
+
+######################################################################
+# required environment variables
+######################################################################
+
+imageDir=${HOME}/.local/share/libvirt
+baseImage=${imageDir}/baseImages/${DIST}-server-cloudimg-amd64.img
+machineImage=${imageDir}/kvmImages/${imageName}.img
+
+########
+
+buildEnvs_memory=2048
+buildEnvs_cpus=2
+
+######################################################################
+
+echo ""
+echo Building something
+echo ""
+echo "----------------------------------------------------------------"
+echo imageName=${imageName}
+echo ""
+echo imageDir=${imageDir}
+echo baseImage=${baseImage}
+echo machineImage=${machineImage}
+echo ""
+echo buildEnvs_memory=${buildEnvs_memory}
+echo buildEnvs_cpus=${buildEnvs_cpus}
+echo ""
+echo pwd=$(pwd)
+echo "----------------------------------------------------------------"
+echo ""
+#
+mkdir -p build
+rm -rf ipAddress
+
+# Start by createing the cloud-init yaml file
+#
+echo ""
+echo "creating the cloudInit.yaml"
+echo ""
+cat > build/cloudInit.yaml <<CLOUD_INIT_YAML
+#cloud-config
+hostname: ${imageName}
+password: ygwomDuKSbdreW8H
+chpasswd: { expire: False }
+ssh_pwauth: True
+users:
+  - default
+  - name: laminar
+    uid: 2424
+    shell: /bin/bash
+    ssh_pwauth: false
+    lock_passwd: true
+    sudo:  ALL=(ALL) NOPASSWD:ALL
+runcmd:
+  - sudo mkdir -p /common
+  - sudo mount -t 9p -o trans=virtio,version=9p2000.L,rw share-common /common
+  - echo export ipAddress=\`ip addr | grep "inet " | grep -v 127 | cut -d' ' -f6 | cut -d'/' -f1\` > /common/ipAddress
+  - sudo groupmod --gid 2424 laminar
+  - sudo usermod --uid 2424 laminar
+  - sudo chown -R laminar.laminar /home/laminar
+  - sudo runuser -u laminar /common/build/buildScript
+  - sudo poweroff
+final_message: "The system ran for \$UPTIME seconds"
+CLOUD_INIT_YAML
+echo ""
+
+# Now build the corresponding cloud-init iso
+#
+echo ""
+echo "cloud-localds build/cloudInit.iso build/cloudInit.yaml"
+echo ""
+echo cloud-localds build/cloudInit.iso build/cloudInit.yaml
+echo ""
+
+# Now create a new backing image for this machine
+#
+echo ""
+echo "qemu-img convert -f qcow2 ${baseImage} ${machineImage}"
+echo ""
+echo qemu-img convert -f qcow2 ${baseImage} ${machineImage}
+echo ""
+
+# Now create the KVM
+#
+cmd=<<KVM_INSTALL
+virt-install \\
+  --connect=qemu:///session \\
+  --name ${imageName} \\
+  --memory ${buildEnvs_memory} \\
+  --vcpus ${buildEnvs_cpus} \\
+  --disk ${machineImage},device=disk,bus=virtio \\
+  --disk $(pwd)/build/cloudInit.iso,device=cdrom \\
+  --filesystem type=mount,mode=squash,source=$(pwd),target=share-common \\
+  --os-type generic \\
+  --virt-type kvm \\
+  --graphics none \\
+  --network bridge=virbr0,model=virtio \\
+  --import \\
+  --debug
+KVM_INSTALL
+
+# see: https://cloudinit.readthedocs.io/en/latest/topics/examples.html
+# see: http://troglobit.github.io/2013/07/05/file-system-pass-through-in-kvm-slash-qemu-slash-libvirt/
+# see: https://jonaspfannschmidt.com/libvirt_session.html
+# see: https://linux.die.net/man/1/virt-install
+
+echo ""
+echo $cmd
+echo ""
+echo $cmd
+
