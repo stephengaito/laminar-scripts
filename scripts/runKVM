@@ -211,6 +211,11 @@ source ipAddress
 echo "  at the ipAddress [${ipAddress}]"
 echo ""
 
+# We wrap the ssh command in script inorder to provide ssh with a "tty" 
+# which allows laminar to echo the ssh commands output in real time. 
+#
+# The script command also provides us with a automatic log file ;-)
+
 echo script -f ${kvmScript}.log                        \
   -c "ssh ${USER}@${ipAddress} ${RUNDIR}/${kvmScript}"
   

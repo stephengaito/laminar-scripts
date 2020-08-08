@@ -1,0 +1,80 @@
+#!/bin/bash
+
+source setupLaminarVars
+
+export RUNDIR=$LAMINAR_RUNDIR
+
+if test -z "$WORKSPACE" -o -z "$PWORKSPACE" -o -z "$ARCHIVE" -o -z "$RUNDIR" -o -z "$DIST"
+then
+  echo "REQUIRED environment variables:"
+  echo ""
+  echo "  WORKSPACE  : the path to the laminar workspace"
+  echo "  PWORKSPACE : the path to the laminar project workspace"
+  echo "  ARCHIVE    : the path to the laminar archive"
+  echo "  RUNDIR     : the path to the laminar (current) directory"
+  echo "  DIST       : the OS distribution"
+  echo ""
+  exit -1
+fi
+
+echo "       JOB=[$JOB]"
+echo "       RUN=[$RUN]"
+echo " WORKSPACE=[$WORKSPACE]"
+echo "PWORKSPACE=[$PWORKSPACE]"
+echo "   ARCHIVE=[$ARCHIVE]"
+echo "    RUNDIR=[$RUNDIR]"
+echo "  TEST_ENV=[$TEST_ENV]"
+echo "      DIST=[$DIST]"
+
+# Make sure that $WORKSPACE/$DIST exists BEFORE podman mounts it
+#
+mkdir -p $PWORKSPACE/$DIST
+
+# We start by creating the script used to control the podman image
+#
+cat <<KVM_SCRIPT > kvmScript
+#!/bin/bash -e
+
+# This bash script is used *inside* a podman image to build pdf2htmlEX.
+
+source $RUNDIR/reSourceLaminarVars
+
+export RUNDIR=$LAMINAR_RUNDIR
+
+echo "       JOB=[\$JOB]"
+echo "       RUN=[\$RUN]"
+echo " WORKSPACE=[\$WORKSPACE]"
+echo "PWORKSPACE=[\$PWORKSPACE]"
+echo "   ARCHIVE=[\$ARCHIVE]"
+echo "    RUNDIR=[\$RUNDIR]"
+echo "  TEST_ENV=[\$TEST_ENV]"
+export  TEST_ENV=\${TEST_ENV:=silly}
+echo "  TEST_ENV=[\$TEST_ENV]"
+
+# we start by doing something simple
+echo "Hello from kvmExample.run in Laminar!"
+
+echo ""
+echo "-----------------------------------------"
+ifconfig
+echo "-----------------------------------------"
+cat /etc/passwd
+echo "-----------------------------------------"
+echo ""
+
+# Now try failing
+/bin/thisCommandShouldNotExist
+
+KVM_SCRIPT
+
+chmod a+x kvmScript
+
+echo "-----------------------------------------"
+cat kvmScript
+echo "-----------------------------------------"
+
+runKVM $DIST-server-cloudimg-amd64.img $JOB-$DIST-$RUN kvmScript
+
+echo ""
+echo "I am done!"
+echo ""
