@@ -6,29 +6,46 @@
 # The following is based upon:
 #   https://www.theurbanpenguin.com/using-cloud-images-in-kvm/
 
-if [ $# -ne 1 ] ; then
-  echo "usage: runKVM <imageName>"
+if [ $# -ne 3 ] ; then
+  echo "usage: runKVM <baseImage> <vmName> <kvmScript>"
   echo ""
-  echo "environment variables:"
-  echo "  DIST : the distribution name of the image to start"
+  echo "  <baseImageName> the name of the OS base image"
+  echo "  <vmName>        the name of the KVM instance"
+  echo "  <kvmScript>     the name of the script in the current directory"
+  echo "                  to be run in the KVM instance"
   echo ""
   exit -1
 fi
 
-imageName=$1
+if test -z "$WORKSPACE" -o -z "$PWORKSPACE" -o -z "$ARCHIVE" -o -z "$RUNDIR"
+then
+  echo "REQUIRED environment variables:"
+  echo ""
+  echo "  WORKSPACE  : the path to the laminar workspace"
+  echo "  PWORKSPACE : the path to the laminar project workspace"
+  echo "  ARCHIVE    : the path to the laminar archive"
+  echo "  RUNDIR     : the path to the laminar (current) directory"
+  echo ""
+  exit -1
+fi
+
+baseImageName=$1
+vmName=$2
+kvmScript=$3
 
 ######################################################################
 # required environment variables
 ######################################################################
 
 imageDir=${HOME}/.local/share/libvirt
-baseImage=${imageDir}/baseImages/${DIST}-server-cloudimg-amd64.img
-machineImage=${imageDir}/kvmImages/${imageName}.img
+baseImage=${imageDir}/baseImages/${baseImageName}
+machineImage=${imageDir}/kvmImages/${vmName}.img
+scriptsDir=${HOME}/tasks/cfg/scripts
 
 ########
 
-buildEnvs_memory=2048
-buildEnvs_cpus=2
+vmMemory=2048
+vmCpus=2
 
 ######################################################################
 
@@ -36,20 +53,32 @@ echo ""
 echo Building something
 echo ""
 echo "----------------------------------------------------------------"
-echo imageName=${imageName}
+echo "          JOB=[$JOB]"
+echo "          RUN=[$RUN]"
+echo "    WORKSPACE=[$WORKSPACE]"
+echo "   PWORKSPACE=[$PWORKSPACE]"
+echo "      ARCHIVE=[$ARCHIVE]"
+echo "       RUNDIR=[$RUNDIR]"
+echo "     TEST_ENV=[$TEST_ENV]"
+echo "         DIST=[$DIST]"
 echo ""
-echo imageDir=${imageDir}
-echo baseImage=${baseImage}
-echo machineImage=${machineImage}
+echo "baseImageName=${baseImageName}"
+echo "       vmName=${vmName}"
+echo "    kvmScript=${kvmScript}"
 echo ""
-echo buildEnvs_memory=${buildEnvs_memory}
-echo buildEnvs_cpus=${buildEnvs_cpus}
+echo "     imageDir=${imageDir}"
+echo "    baseImage=${baseImage}"
+echo " machineImage=${machineImage}"
+echo "   scriptsDir=${scriptsDir}"
 echo ""
-echo pwd=$(pwd)
+echo "     vmMemory=${vmMemory}"
+echo "       vmCpus=${vmCpus}"
+echo ""
+echo "          pwd=$(pwd)"
 echo "----------------------------------------------------------------"
 echo ""
 #
-mkdir -p build
+mkdir -p kvmBuild
 rm -rf ipAddress
 
 # Start by createing the cloud-init yaml file
@@ -57,39 +86,55 @@ rm -rf ipAddress
 echo ""
 echo "creating the cloudInit.yaml"
 echo ""
-cat > build/cloudInit.yaml <<CLOUD_INIT_YAML
+cat > kvmBuild/cloudInit.yaml <<CLOUD_INIT_YAML
 #cloud-config
-hostname: ${imageName}
-password: ygwomDuKSbdreW8H
+hostname: ${vmName}
 chpasswd: { expire: False }
 ssh_pwauth: True
 users:
   - default
-  - name: laminar
-    uid: 2424
+  - name: ${USER}
+    uid: ${UID}
     shell: /bin/bash
     ssh_pwauth: false
     lock_passwd: true
     sudo:  ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+$(cat ${scriptsDir}/kvmAuthorizedKeys | xargs -d'\n' -I {} echo "      - {}")
 runcmd:
-  - sudo mkdir -p /common
-  - sudo mount -t 9p -o trans=virtio,version=9p2000.L,rw share-common /common
-  - echo export ipAddress=\`ip addr | grep "inet " | grep -v 127 | cut -d' ' -f6 | cut -d'/' -f1\` > /common/ipAddress
-  - sudo groupmod --gid 2424 laminar
-  - sudo usermod --uid 2424 laminar
-  - sudo chown -R laminar.laminar /home/laminar
-  - sudo runuser -u laminar /common/build/buildScript
-  - sudo poweroff
-final_message: "The system ran for \$UPTIME seconds"
+  - sudo mkdir -p $WORKSPACE
+  - sudo mkdir -p $PWORKSPACE
+  - sudo mkdir -p $ARCHIVE
+  - sudo mkdir -p $RUNDIR
+  - sudo mount -t 9p -o trans=virtio,version=9p2000.L,rw share-workspace $WORKSPACE
+  - sudo mount -t 9p -o trans=virtio,version=9p2000.L,rw share-pworkspace $PWORKSPACE
+  - sudo mount -t 9p -o trans=virtio,version=9p2000.L,rw share-archive $ARCHIVE
+  - sudo mount -t 9p -o trans=virtio,version=9p2000.L,rw share-rundir $RUNDIR
+  - echo export ipAddress=\`ip addr | grep "inet " | grep -v 127 | cut -d' ' -f6 | cut -d'/' -f1\` > ${RUNDIR}/ipAddress
+  - sudo groupmod --gid ${UID} ${USER}
+  - sudo usermod --uid ${UID} ${USER}
+  - sudo chown -R ${USER}.${USER} ${HOME}
+final_message: "The system setup took \$UPTIME seconds"
 CLOUD_INIT_YAML
 echo ""
 
 # Now build the corresponding cloud-init iso
 #
 echo ""
-echo "cloud-localds build/cloudInit.iso build/cloudInit.yaml"
+echo "cloud-localds kvmBuild/cloudInit.iso kvmBuild/cloudInit.yaml"
 echo ""
-echo cloud-localds build/cloudInit.iso build/cloudInit.yaml
+cloud-localds kvmBuild/cloudInit.iso kvmBuild/cloudInit.yaml
+echo ""
+
+# Clear out any previously existing vms
+#
+echo "clearing out old KVM instances"
+echo ""
+virsh --connect=qemu:///session shutdown ${vmName}
+echo ""
+virsh --connect=qemu:///session undefine ${vmName}
+echo ""
+rm -r ${machineImage}
 echo ""
 
 # Now create a new backing image for this machine
@@ -97,27 +142,37 @@ echo ""
 echo ""
 echo "qemu-img convert -f qcow2 ${baseImage} ${machineImage}"
 echo ""
-echo qemu-img convert -f qcow2 ${baseImage} ${machineImage}
+qemu-img convert -f qcow2 ${baseImage} ${machineImage}
 echo ""
 
 # Now create the KVM
 #
-cmd=<<KVM_INSTALL
-virt-install \\
+cat > createKVM <<KVM_INSTALL
+#!/bin/bash
+
+# This bash script creates a particular KVM machine for laminar
+
+exec virt-install \\
   --connect=qemu:///session \\
-  --name ${imageName} \\
-  --memory ${buildEnvs_memory} \\
-  --vcpus ${buildEnvs_cpus} \\
+  --name ${vmName} \\
+  --memory ${vmMemory} \\
+  --vcpus ${vmCpus} \\
   --disk ${machineImage},device=disk,bus=virtio \\
-  --disk $(pwd)/build/cloudInit.iso,device=cdrom \\
-  --filesystem type=mount,mode=squash,source=$(pwd),target=share-common \\
+  --disk $(pwd)/kvmBuild/cloudInit.iso,device=cdrom \\
+  --filesystem type=mount,mode=squash,source=${WORKSPACE},target=share-workspace \\
+  --filesystem type=mount,mode=squash,source=${PWORKSPACE},target=share-pworkspace \\
+  --filesystem type=mount,mode=squash,source=${ARCHIVE},target=share-archive \\
+  --filesystem type=mount,mode=squash,source=${RUNDIR},target=share-rundir \\
   --os-type generic \\
   --virt-type kvm \\
   --graphics none \\
   --network bridge=virbr0,model=virtio \\
+  --noautoconsole \\
   --import \\
   --debug
 KVM_INSTALL
+
+chmod a+x createKVM
 
 # see: https://cloudinit.readthedocs.io/en/latest/topics/examples.html
 # see: http://troglobit.github.io/2013/07/05/file-system-pass-through-in-kvm-slash-qemu-slash-libvirt/
@@ -125,7 +180,60 @@ KVM_INSTALL
 # see: https://linux.die.net/man/1/virt-install
 
 echo ""
-echo $cmd
+echo "----------------------------------------------------------------"
+cat createKVM
+echo "----------------------------------------------------------------"
+./createKVM
+echo "----------------------------------------------------------------"
 echo ""
-echo $cmd
 
+echo "Waiting for KVM instance to report ipAddress"
+
+rm -f ipAddress
+
+for count in {1..100} ; do
+  if [ -r ipAddress ] ; then 
+    break
+  fi
+  echo -n "."
+  sleep 1
+done
+echo ""
+echo ""
+if test ! -r ipAddress ; then
+  echo "timeout waiting for ipAddress"
+  exit -1
+fi
+
+echo "running the kvmScript [${kvmScript}]"
+echo "  in the KVM virtual machine named [${vmName}]"
+source ipAddress
+echo "  at the ipAddress [${ipAddress}]"
+echo ""
+
+echo script -f ${kvmScript}.log                        \
+  -c "ssh ${USER}@${ipAddress} ${RUNDIR}/${kvmScript}"
+  
+script -f ${kvmScript}.log                             \
+  -c "ssh ${USER}@${ipAddress} ${RUNDIR}/${kvmScript}"
+
+echo ""
+echo ""
+
+virsh --connect=qemu:///session shutdown ${vmName}
+
+echo "Waiting for KVM instance to shut down"
+
+count=0
+for count in {1..100} ; do
+  if [ "$(virsh --connect=qemu:///session domstate ${vmName})" == "shut off" ] ; then
+    break
+  fi
+  echo -n "."
+  sleep 1
+done
+echo ""
+
+echo "----------------------------------------------------------------"
+
+echo ""

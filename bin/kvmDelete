@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# This bash script deletes KVM instances for the laminar user
+
+
+if [ $# -ne 1 ] ; then
+  echo "usage: kvmDelete <imageName>"
+fi
+
+imageName=$1
+
+virsh --connect=qemu:///session shutdown $imageName
+
+virsh --connect=qemu:///session undefine $imageName
+
+rm -rf /home/laminar/.local/share/libvirt/kvmImages/$imageName.img

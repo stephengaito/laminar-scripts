@@ -17,6 +17,7 @@ cp bin/startLaminar*           $BIN_DIR
 cp bin/abortLaminar*           $BIN_DIR
 cp bin/clearLaminar*           $BIN_DIR
 cp bin/getLaminar*             $BIN_DIR
+cp bin/kvm*                    $BIN_DIR
 
 mkdir -p $CFG_DIR
 cp cfgs/before                 $CFG_DIR
@@ -28,6 +29,8 @@ cp jobs/buildPodman*Base.run   $JOB_DIR
 
 mkdir -p $SCP_DIR
 cp scripts/setupLaminarVars    $SCP_DIR
+cp scripts/runKVM              $SCP_DIR
+cp scripts/kvmAuthorizedKeys   $SCP_DIR
 
 mkdir -p $CTX_DIR
 cp contexts/*                  $CTX_DIR

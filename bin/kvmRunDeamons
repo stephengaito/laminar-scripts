@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# This bash script is a very crude attempt to keep the libvirtd deamons 
+# running by the init system (rather than by laminar). 
+
+sshKey=${HOME}/.ssh/id_rsa
+
+echo ""
+echo "This bash script is a very crude attempt to keep the libvirtd deamons"
+echo "running by the init system (rather than by laminar). "
+echo ""
+
+echo "Add the sshKey [${sshKey}]"
+ssh-add ${sshKey}
+echo ""
+
+while true ; do
+  echo "----------------------------------------------------------------"
+  date
+  echo "----------------------------------------------------------------"
+  echo "number of ssh keys: $(ssh-add -L | wc -l)"
+  echo "----------------------------------------------------------------"
+  virsh --connect=qemu:///session list --all
+  sleep 60
+done
+

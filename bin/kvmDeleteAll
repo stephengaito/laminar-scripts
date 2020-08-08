@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# This bash script deletes all known kvm instances for the user laminar
+
+for imageName in $(virsh --connect=qemu:///session list --all --name) ; do
+  virsh --connect=qemu:///session shutdown $imageName
+
+  virsh --connect=qemu:///session undefine $imageName
+
+  rm -rf /home/laminar/.local/share/libvirt/kvmImages/$imageName.img
+done 
+
+rm -rf /home/laminar/.local/share/libvirt/kvmImages/*.img

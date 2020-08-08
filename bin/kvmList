@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# This bash script lists all known KVM machines
+
+echo ""
+echo "Listing kvm images"
+echo ""
+
+virsh --connect qemu:///session list --all
