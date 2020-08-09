@@ -2,8 +2,6 @@
 
 # This bash script setups and runs laminar
 
-ssh-add /home/laminar/.ssh/laminar_nn01-laminar-rsa
-
 export LAMINAR_HOME=/home/laminar/tasks
 export LAMINAR_BIND_HTTP=*:8888
 export LAMINAR_TITLE="PerceptiSys Laminar CI"

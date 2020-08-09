@@ -200,7 +200,10 @@ for count in {1..100} ; do
 done
 echo ""
 echo ""
-if test ! -r ipAddress ; then
+if test -r ipAddress ; then
+  echo "sleeping for 10 seconds to let the KVM's sshd to startup"
+  sleep 10
+else
   echo "timeout waiting for ipAddress"
   exit -1
 fi
@@ -216,11 +219,11 @@ echo ""
 #
 # The script command also provides us with a automatic log file ;-)
 
-echo script -f ${kvmScript}.log                        \
-  -c "ssh ${USER}@${ipAddress} ${RUNDIR}/${kvmScript}"
+echo script -f ${kvmScript}.log \
+  -c "ssh -i ${HOME}/.ssh/kvm_id_rsa ${USER}@${ipAddress} ${RUNDIR}/${kvmScript}"
   
-script -f ${kvmScript}.log                             \
-  -c "ssh ${USER}@${ipAddress} ${RUNDIR}/${kvmScript}"
+script -f ${kvmScript}.log \
+  -c "ssh -i ${HOME}/.ssh/kvm_id_rsa ${USER}@${ipAddress} ${RUNDIR}/${kvmScript}"
 
 echo ""
 echo ""
