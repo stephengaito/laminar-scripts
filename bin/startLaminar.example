@@ -7,9 +7,15 @@ export LAMINAR_BIND_HTTP=*:8888
 export LAMINAR_TITLE="PerceptiSys Laminar CI"
 export LAMINAR_KEEP_RUNDIRS=5
 
+# uncomment the following line if you are using laminar in a subdirectory 
+# of a reverse proxy: 
+#
+#export LAMINAR_BASE_URL=/laminar/
+
 echo ""
 echo "laminar is running on:"
 echo ""
+#echo "  http://127.0.0.1:8888/laminar/"
 echo "  http://127.0.0.1:8888/"
 echo ""
 echo "laminar documentation:"
